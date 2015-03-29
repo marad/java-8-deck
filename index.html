@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=1024, user-scalable=no">
 
-    <title>Java 8 Day</title>
+    <title>Java 8 - Inference, Interface, Optional</title>
 
     <!-- Required stylesheet -->
     <link rel="stylesheet" href="core/deck.core.css">
@@ -82,7 +82,7 @@
       font-size: 0.2em;
     }
 
-    h1 div.biczplis {
+    h1 div.subtitle {
       font-size: 0.4em;
     }
 
@@ -100,7 +100,11 @@
       <!-- Begin slides. Just make elements with a class of slide. -->
 
       <section class="slide">
-        <h1>Java 8</h1>
+        <h1>
+          <div>Java 8</div>
+          <div class="subtitle">Type Inference, Interface default methods, and Optional</div>
+        </h1>
+
       </section>
 
       <section class="slide">
@@ -199,14 +203,195 @@ val it: Iterator[String] = new ArrayList().iterator()</pre></p>
 
       <section class="slide">
         <h2>Interfejs -  Metody Domyślne</h2>
+
+        <p>Żeby utworzyć metodę domyślną wystarczy dopisać <code>default</code>:</p>
+
+        <pre class="sh_java">public interface DefaultMethod {
+  default String getGreeting() {
+    return "Hello World";
+  }
+}</pre>
+        <div class="slide">
+          <p>Teraz jeśli extendujemy interfejs w innym interfejsie to mamy 3 opcje:</p>
+          <p>
+            <ul>
+              <li>Nie napisać nic o metodzie domyślnej - wtedy użyta zostanie domyślna implementacja</li>
+              <li>Zadeklarować metodę domyślną jeszcze raz - staje się ona abstrakcyjna</li>
+              <li>Nadpisać metodę domyślną</li>
+            </ul>
+          </p>
+        </div>
+      </section>
+
+      <section class="slide">
+        <h2>Interfejs - Metody Domyślne</h2>
+        <pre class="sh_java">public interface First extends DefaultMethod {
+}</pre>
+        <p>Posiada domyślną implementację z <code>DefaultMethod</code>.</p>
+        <pre class="sh_java">public interface Second extends DefaultMethod {
+  String getGreeting();
+}</pre>
+        <p>Usuwa domyślną implementację.</p>
+        <pre class="sh_java">public interface Third extends DefaultMethod {
+  default String getGreeting() {
+    return "Something else";
+  }
+}</pre>
+        <p>Deklaruje nową domyślną treść metody.</p>
+      </section>
+
+      <section class="slide">
+        <h2>Interfejs - Metody Domyślne</h2>
+        <p>Z implementacjami w klasach można zrobić to samo, ale trzeba to zapisać inaczej:</p>
+        <pre class="sh_java">public class FirstClass implements DefaultMethod {
+}</pre>
+        <pre class="sh_java">public abstract class SecondClass implements DefaultMethod {
+  abstract String getGreeting();
+}</pre>
+        <pre class="sh_java">public class ThirdClass implements DefaultMethod {
+  @Override
+  String getGreeting() {
+    return "Other value";
+  }
+}</pre>
       </section>
 
       <section class="slide">
         <h2>Interfejs - Metody Statyczne</h2>
+        <p>W Javie 8 dostaliśmy możliwość umieszczania w interfejsach także metod statycznych:</p>
+        <pre class="sh_java">public interface StaticMethod {
+  static Double defaultGreetingMessage() {
+    return "Hello World";
+  }
+}</pre>
+        <p>
+          Wprowadzone z myślą o utilowych funkcjonalnościach, które w innym przypadku musiałyby
+          wylądować w osobnej klasie ze statycznymi metodami.
+        </p>
       </section>
 
       <section class="slide">
-        <h2>Optional</h2>
+        <h2>Czyżby wszystko było po prostu ok?</h2>
+        <div class="slide">
+          <h3>Oczywiście, że nie!</h3>
+          <p>
+            Nie możemy deklarować metod domyślnych ani statycznych jako <code>private</code>.
+          </p>
+          <p>
+            To sprawia, że bardziej skomplikowane funkcjonalności będzie trzeba trzymać albo
+            w implementadji danej metody (długie metody) albo pogodzić się z tym, że klasy
+            pochodne będą miały dostęp do szczegółów implementacji. :(
+          </p>
+        </div>
+      </section>
+
+      <section class="slide">
+        <h2>Monada Optional</h2>
+        <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html" target="about:blank">Optional JavaDoc</a>
+        <p>Mamy trzy sposoby na utworzenie <code>Optional</code>a:</p>
+        <pre class="sh_java">Optional&lt;Float&gt;   f = Optional.empty();</pre>
+        <pre class="sh_java">Optional&lt;Integer&gt; i = Optional.of(10);</pre>
+        <pre class="sh_java">Optional&lt;String&gt;  s = Optional.ofNullable(getMessage());</pre>
+      </section>
+
+      <sction class="slide">
+        <h2>Monada Optional</h2>
+        <p>Spójrzmy na to:</p>
+        <pre class="sh_java">Person person = personMap.get("Name");
+process(person.getAddress().getCity());</pre>
+        <div class="slide">
+          <p>Dodajmy error checki:</p>
+          <pre class="sh_java">Person person = personMap.get("Name");
+if (person != null) {
+  Address address = person.getAddress();
+  if (address != null) {
+    City city = address.getCity();
+    if (city != null) {
+      process(city);
+    }
+  }
+}</pre>
+        </div>
+      </sction>
+
+      <section class="slide">
+        <h2>Monada Optional</h2>
+        <p>Ok, no to użyjmy <code>Optional</code>:</p>
+        <pre class="sh_java">Optional&lt;Person&gt; person = personMap.get("Name");
+if (person.isPresent()) {
+  Optional&lt;Address&gt; address = person.getAddress();
+  if (address.isPresent()) {
+    Optional&lt;City&gt; city = address.getCity();
+    if (city.isPresent()) {
+      process(city);
+    }
+  }
+}</pre>
+        <div class="slide">
+          <h3>WAT? Miało być lepiej!</h3>
+        </div>
+        <div class="slide">
+          <h3>JEST lepiej, bo dużo trudniej o <code>NullPointerException</code></h3>
+        </div>
+      </section>
+
+      <section class="slide">
+        <h2>Monada Optional</h2>
+        <p>Ok, to może jeszcze nieco inaczej?</p>
+        <pre class="sh_java">Optional&lt;Person&gt; person = personMap.get("Name");
+person.ifPresent(p -&gt;
+  p.getAddress().ifPresent(a -&gt;
+    a.getCity().ifPresent(this::process)
+  );
+);</pre>
+      </section>
+
+      <section class="slide">
+        <h2>Ok, a co to jest monada?</h2>
+        <div>Możemy mówić o monadzie kiedy spełnimy 3 warunki:</div>
+        <ul>
+          <li>Mamy parametryzowalny typ <code>M[T]</code></li>
+          <li>Mamy funkcję <em>unit</em> typu <code>T =&gt; M[T]</code></li>
+          <li>Mamy funkcję <em>bind</em> typu <code>(M[T], T =&gt; M[T]) =&gt; M[T]</code></li>
+        </ul>
+        <div>To wygląda trochę strasznie...</div>
+        <div class="slide nogray">
+          <div>...ale na przykładzie będzie bardziej oczywiste:</div>
+          <ul>
+            <li>Mamy parametryzowalny typ <code>Optional&lt;T&gt;</code></li>
+            <li>Mamy funkcję <em>unit</em>: <code>Optional.of()</code></li>
+            <li>Mamy funkcję <em>bind</em>: <code>optValue.flatMap()</code></li>
+          </ul>
+        </div>
+        <div class="slide">
+          <h3>A co to daje?</h3>
+        </div>
+      </section>
+
+      <section class="slide">
+        <h2>Monada Optional - Full Powah!</h2>
+        <pre class="sh_java">personMap.find("Name")
+  .flatMap(Person::getAddress)
+  .flatMap(Address::getCity)
+  .ifPresent(this::process);</pre>
+        <div class="slide nogray">
+          <h3>Bonus</h3>
+          <p>Tak, <code>Observable</code> w <em>RxJava</em> to też monadą:</p>
+          <ul>
+            <li>Mamy typ <code>Observable&lt;T&gt;</code></li>
+            <li>Funkcja <em>unit</em>: <code>Observable.from()</code></li>
+            <li>Funkcja <em>bind</em>: <code>Observable.flatMap()</code></li>
+          </ul>
+
+        </div>
+        <div class="slide">
+          <p>Tak, <code>Stream</code> w Javie też jest monadą:</p>
+          <ul>
+            <li>Mamy typ <code>Stream&lt;T&gt;</code></li>
+            <li>Funkcja <em>unit</em>: <code>Stream.of()</code></li>
+            <li>Funkcja <em>bind</em>: <code>Stream.flatMap()</code></li>
+          </ul>
+        </div>
       </section>
 
       <section class="slide">
