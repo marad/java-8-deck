@@ -107,6 +107,7 @@
 
       </section>
 
+    <!--
       <section class="slide">
         <h2>Inferencja Typów - Metody Generyczne</h2>
         <div>
@@ -132,6 +133,7 @@
 }</pre>
         </div>
       </section>
+    -->
 
       <section class="slide">
         <h2>Inferencja Typów - Diamond Notation</h2>
@@ -147,21 +149,20 @@
 
       <section class="slide">
         <h2>Inferencja Typów - Generyczne Konstruktory</h2>
-        <pre class="sh_java">class MyClass&lt;X&gt; {
-  &lt;T&gt; MyClass(T t) {
-    // ...
+        <pre class="sh_java">class Entry {
+  public &lt;E extends Rankable &amp; Serializable&gt; Entry(E element) {
+    this.data = element.toString();
+    this.rank = element.getRank();
   }
+
+  // ...
 }</pre>
-        <p>Aby później utworzyć instancję wystarczy:</p>
-        <pre class="sh_java">MyClass&lt;Integer&gt; instance = new MyClass<>("Hello");</pre>
 
-        <div class="slide">
-          <p>Tylko po co to właściwie jest?</p>
-        </div>
-
-        <div class="slide">
-          <p>Mnie nie pytajcie bo ja nie wiem.</p>
-        </div>
+        <section class="slide">
+            <a href="https://www.baeldung.com/java-generic-constructors">
+                Reszta przykładu
+            </a>
+        </section>
       </section>
 
       <section class="slide">
@@ -215,9 +216,9 @@ val it: Iterator[String] = new ArrayList().iterator()</pre></p>
           <p>Teraz jeśli extendujemy interfejs w innym interfejsie to mamy 3 opcje:</p>
           <p>
             <ul>
-              <li>Nie napisać nic o metodzie domyślnej - wtedy użyta zostanie domyślna implementacja</li>
-              <li>Zadeklarować metodę domyślną jeszcze raz - staje się ona abstrakcyjna</li>
-              <li>Nadpisać metodę domyślną</li>
+              <li class="slide">Nie napisać nic o metodzie domyślnej - wtedy użyta zostanie domyślna implementacja</li>
+              <li class="slide">Zadeklarować metodę domyślną jeszcze raz - staje się ona abstrakcyjna</li>
+              <li class="slide">Nadpisać metodę domyślną</li>
             </ul>
           </p>
         </div>
@@ -225,19 +226,25 @@ val it: Iterator[String] = new ArrayList().iterator()</pre></p>
 
       <section class="slide">
         <h2>Interfejs - Metody Domyślne</h2>
-        <pre class="sh_java">public interface First extends DefaultMethod {
+        <section class="slide">
+            <pre class="sh_java">public interface First extends DefaultMethod {
 }</pre>
-        <p>Posiada domyślną implementację z <code>DefaultMethod</code>.</p>
-        <pre class="sh_java">public interface Second extends DefaultMethod {
+            <p>Posiada domyślną implementację z <code>DefaultMethod</code>.</p>
+        </section>
+        <section class="slide">
+            <pre class="sh_java">public interface Second extends DefaultMethod {
   String getGreeting();
 }</pre>
-        <p>Usuwa domyślną implementację.</p>
-        <pre class="sh_java">public interface Third extends DefaultMethod {
+            <p>Usuwa domyślną implementację.</p>
+        </section>
+        <section class="slide">
+            <pre class="sh_java">public interface Third extends DefaultMethod {
   default String getGreeting() {
     return "Something else";
   }
 }</pre>
-        <p>Deklaruje nową domyślną treść metody.</p>
+            <p>Deklaruje nową domyślną treść metody.</p>
+        </section>
       </section>
 
       <section class="slide">
@@ -369,22 +376,13 @@ person.ifPresent(p -&gt;
       </section>
 
       <section class="slide">
-        <h2>Monada Optional - Full Powah!</h2>
-        <pre class="sh_java">personMap.find("Name")
+        <h2>Monada Optional - Pełna moc!</h2>
+        <pre class="sh_java">people.find("Name")
   .flatMap(Person::getAddress)
   .flatMap(Address::getCity)
   .ifPresent(this::process);</pre>
-        <div class="slide nogray">
-          <h3>Bonus</h3>
-          <p>Tak, <code>Observable</code> w <em>RxJava</em> to też monadą:</p>
-          <ul>
-            <li>Mamy typ <code>Observable&lt;T&gt;</code></li>
-            <li>Funkcja <em>unit</em>: <code>Observable.from()</code></li>
-            <li>Funkcja <em>bind</em>: <code>Observable.flatMap()</code></li>
-          </ul>
-
-        </div>
         <div class="slide">
+          <h3>Bonus</h3>
           <p>Tak, <code>Stream</code> w Javie też jest monadą:</p>
           <ul>
             <li>Mamy typ <code>Stream&lt;T&gt;</code></li>
@@ -395,7 +393,7 @@ person.ifPresent(p -&gt;
       </section>
 
       <section class="slide">
-        <h1>Let's Get The Party Started!</h1>
+        <h1>Dzięki!</h1>
       </section>
 
       <!-- End slides. -->
